@@ -1,0 +1,14 @@
+/Users/michaelweinheimer/projects/pgxtop/target/debug/deps/serde-34afccaa4cfbe6b7.d: /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/michaelweinheimer/projects/pgxtop/target/debug/build/serde-5e589c3d3c90d455/out/private.rs
+
+/Users/michaelweinheimer/projects/pgxtop/target/debug/deps/libserde-34afccaa4cfbe6b7.rlib: /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/michaelweinheimer/projects/pgxtop/target/debug/build/serde-5e589c3d3c90d455/out/private.rs
+
+/Users/michaelweinheimer/projects/pgxtop/target/debug/deps/libserde-34afccaa4cfbe6b7.rmeta: /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs /Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs /Users/michaelweinheimer/projects/pgxtop/target/debug/build/serde-5e589c3d3c90d455/out/private.rs
+
+/Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/lib.rs:
+/Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/integer128.rs:
+/Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/mod.rs:
+/Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/de.rs:
+/Users/michaelweinheimer/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.229/src/private/ser.rs:
+/Users/michaelweinheimer/projects/pgxtop/target/debug/build/serde-5e589c3d3c90d455/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/michaelweinheimer/projects/pgxtop/target/debug/build/serde-5e589c3d3c90d455/out
