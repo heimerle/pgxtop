@@ -1,9 +1,0 @@
-(function() {
-    const implementors = Object.fromEntries([["sysinfo",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"enum\" href=\"sysinfo/enum.DiskKind.html\" title=\"enum sysinfo::DiskKind\">DiskKind</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"struct\" href=\"sysinfo/struct.IpNetwork.html\" title=\"struct sysinfo::IpNetwork\">IpNetwork</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"struct\" href=\"sysinfo/struct.MacAddr.html\" title=\"struct sysinfo::MacAddr\">MacAddr</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"struct\" href=\"sysinfo/struct.Pid.html\" title=\"struct sysinfo::Pid\">Pid</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"enum\" href=\"sysinfo/enum.ProcessStatus.html\" title=\"enum sysinfo::ProcessStatus\">ProcessStatus</a>",0],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"enum\" href=\"sysinfo/enum.Signal.html\" title=\"enum sysinfo::Signal\">Signal</a>",0]]]]);
-    if (window.register_implementors) {
-        window.register_implementors(implementors);
-    } else {
-        window.pending_implementors = implementors;
-    }
-})()
-//{"start":59,"fragment_lengths":[1531]}

@@ -1,2 +1,0 @@
-createSrcSidebar('[["sysinfo",["",[["common",[],["component.rs","disk.rs","mod.rs","network.rs","system.rs","user.rs"]],["unix",[["apple",[["macos",[["component",[],["arm.rs","mod.rs"]]],["cpu.rs","disk.rs","ffi.rs","mod.rs","process.rs","system.rs","utils.rs"]]],["component.rs","cpu.rs","disk.rs","ffi.rs","groups.rs","mod.rs","network.rs","process.rs","system.rs","users.rs","utils.rs"]]],["groups.rs","mod.rs","network_helper.rs","users.rs","utils.rs"]]],["debug.rs","lib.rs","macros.rs","network.rs","utils.rs"]]]]');
-//{"start":19,"fragment_lengths":[499]}
