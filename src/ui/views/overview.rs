@@ -5,6 +5,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::Frame;
 
 use crate::app::App;
+use crate::ui::widgets::graph::Graph;
 
 pub fn render(f: &mut Frame, area: Rect, app: &App) {
     let chunks = Layout::default()
@@ -60,6 +61,17 @@ fn render_gpu_summary(f: &mut Frame, area: Rect, app: &App) {
         }
     }
 
+    // Show GPU history sparkline if available
+    if let Some(history) = app.gpu_history.get(0) {
+        if !history.utilization.is_empty() {
+            let spark_area = Rect::new(inner.left(), inner.top() + inner.height - 3, inner.width, 3);
+            f.render_widget(
+                Graph::new(history.utilization.clone(), 100.0, Color::Green),
+                spark_area,
+            );
+        }
+    }
+
     f.render_widget(Paragraph::new(lines), inner);
 }
 
@@ -94,6 +106,15 @@ fn render_system_summary(f: &mut Frame, area: Rect, app: &App) {
             Span::raw(format!(" Load  {:.2} / {:.2} / {:.2}",
                 metrics.load_avg[0], metrics.load_avg[1], metrics.load_avg[2])),
         ]));
+    }
+
+    // Show CPU history sparkline if available
+    if !app.system_history.cpu.is_empty() {
+        let spark_area = Rect::new(inner.left(), inner.top() + inner.height - 3, inner.width, 3);
+        f.render_widget(
+            Graph::new(app.system_history.cpu.clone(), 100.0, Color::Cyan),
+            spark_area,
+        );
     }
 
     f.render_widget(Paragraph::new(lines), inner);

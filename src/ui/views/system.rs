@@ -5,6 +5,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::Frame;
 
 use crate::app::App;
+use crate::ui::widgets::graph::Graph;
 
 pub fn render(f: &mut Frame, area: Rect, app: &App) {
     let chunks = Layout::default()
@@ -12,11 +13,13 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
         .constraints([
             Constraint::Min(10),
             Constraint::Min(10),
+            Constraint::Min(8),
         ])
         .split(area);
 
     render_cpu(f, chunks[0], app);
     render_memory(f, chunks[1], app);
+    render_cpu_history(f, chunks[2], app);
 }
 
 fn render_cpu(f: &mut Frame, area: Rect, app: &App) {
@@ -68,4 +71,18 @@ fn render_memory(f: &mut Frame, area: Rect, app: &App) {
     }
 
     f.render_widget(Paragraph::new(lines), inner);
+}
+
+fn render_cpu_history(f: &mut Frame, area: Rect, app: &App) {
+    let block = Block::default()
+        .title("CPU HISTORY")
+        .borders(Borders::all());
+
+    let inner = block.inner(area);
+    f.render_widget(block, area);
+
+    f.render_widget(
+        Graph::new(app.system_history.cpu.clone(), 100.0, Color::Cyan),
+        inner,
+    );
 }

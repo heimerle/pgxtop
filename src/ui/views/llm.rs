@@ -5,6 +5,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::Frame;
 
 use crate::app::App;
+use crate::ui::widgets::graph::Graph;
 
 pub fn render(f: &mut Frame, area: Rect, app: &App) {
     let chunks = Layout::default()
@@ -12,11 +13,13 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
         .constraints([
             Constraint::Min(10),
             Constraint::Min(10),
+            Constraint::Min(8),
         ])
         .split(area);
 
     render_engines(f, chunks[0], app);
     render_models(f, chunks[1], app);
+    render_inference_history(f, chunks[2], app);
 }
 
 fn render_engines(f: &mut Frame, area: Rect, app: &App) {
@@ -80,4 +83,29 @@ fn render_models(f: &mut Frame, area: Rect, app: &App) {
     }
 
     f.render_widget(Paragraph::new(lines), inner);
+}
+
+fn render_inference_history(f: &mut Frame, area: Rect, app: &App) {
+    let block = Block::default()
+        .title("INFERENCE HISTORY")
+        .borders(Borders::all());
+
+    let inner = block.inner(area);
+    f.render_widget(block, area);
+
+    if app.inference_history.prompt_tok_s.is_empty() {
+        return;
+    }
+
+    let graph_area = Rect::new(inner.left(), inner.top(), inner.width, inner.height / 2);
+    f.render_widget(
+        Graph::new(app.inference_history.prompt_tok_s.clone(), 10000.0, Color::Yellow),
+        graph_area,
+    );
+
+    let graph_area = Rect::new(inner.left(), inner.top() + inner.height / 2, inner.width, inner.height / 2);
+    f.render_widget(
+        Graph::new(app.inference_history.gen_tok_s.clone(), 1000.0, Color::Green),
+        graph_area,
+    );
 }

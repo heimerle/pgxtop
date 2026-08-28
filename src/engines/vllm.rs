@@ -4,19 +4,19 @@ use crate::models::inference::{
     EngineStatus, EngineType, InferenceEngine, InferenceMetrics, ModelInstance, ModelStatus,
 };
 
-pub async fn fetch_models(url: &str) -> Vec<ModelInstance> {
+pub async fn fetch_models(url: &str) -> (Vec<ModelInstance>, EngineStatus) {
     let client = reqwest::Client::new();
     let endpoint = format!("{}/v1/models", url);
 
     match client.get(&endpoint).timeout(std::time::Duration::from_secs(5)).send().await {
         Ok(response) => {
             if let Ok(data) = response.json::<serde_json::Value>().await {
-                parse_models(&data)
+                (parse_models(&data), EngineStatus::Connected)
             } else {
-                Vec::new()
+                (Vec::new(), EngineStatus::Unavailable)
             }
         }
-        Err(_) => Vec::new(),
+        Err(_) => (Vec::new(), EngineStatus::Unavailable),
     }
 }
 

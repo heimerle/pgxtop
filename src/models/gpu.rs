@@ -24,8 +24,8 @@ pub struct GpuMetrics {
     pub sm_clock: Option<u32>,
     pub mem_clock: Option<u32>,
     pub fan_speed: Option<u32>,
-    pub pcie_tx: Option<u64>,
-    pub pcie_rx: Option<u64>,
+    pub pcie_tx: Option<u32>,
+    pub pcie_rx: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -54,10 +54,31 @@ pub enum View {
 
 impl App {
     pub async fn new(config: Config) -> anyhow::Result<Self> {
-        let collectors = Collectors::new();
+        let mut collectors = Collectors::new();
         let ui = Ui::new(config.clone());
 
         let max_points = 300;
+
+        // Set up inference engines from config
+        if config.ollama.enabled {
+            collectors.inference.add_engine(InferenceEngine {
+                id: "ollama".to_string(),
+                name: "Ollama".to_string(),
+                engine_type: crate::engines::EngineType::Ollama,
+                url: config.ollama.url.clone(),
+                status: crate::engines::EngineStatus::Connecting,
+            });
+        }
+
+        for vllm_config in &config.vllm {
+            collectors.inference.add_engine(InferenceEngine {
+                id: vllm_config.name.clone(),
+                name: format!("vLLM ({})", vllm_config.name),
+                engine_type: crate::engines::EngineType::Vllm,
+                url: vllm_config.url.clone(),
+                status: crate::engines::EngineStatus::Connecting,
+            });
+        }
 
         Ok(Self {
             config,
@@ -121,7 +142,15 @@ impl App {
         self.gpu_metrics.clear();
         self.gpu_processes.clear();
 
-        for (info, metrics, processes) in gpu_data {
+        // Update GPU history
+        if self.gpu_history.len() < gpu_data.len() {
+            self.gpu_history.resize_with(gpu_data.len(), || GpuHistory::new(300));
+        }
+
+        for (i, (info, metrics, processes)) in gpu_data.into_iter().enumerate() {
+            if let Some(history) = self.gpu_history.get_mut(i) {
+                history.push(&metrics);
+            }
             self.gpu_info.push(info);
             self.gpu_metrics.push(metrics);
             self.gpu_processes.extend(processes);
@@ -130,7 +159,8 @@ impl App {
         // Collect system data
         let (sys_info, sys_metrics, sys_procs) = self.collectors.system.collect();
         self.system_info = Some(sys_info);
-        self.system_metrics = Some(sys_metrics);
+        self.system_metrics = Some(sys_metrics.clone());
+        self.system_history.push(&sys_metrics);
         self.system_processes = sys_procs;
 
         // Collect inference data
@@ -142,7 +172,8 @@ impl App {
         for (engine, models, metrics) in inference_data {
             self.inference_engines.push(engine);
             self.model_instances.extend(models);
-            self.inference_metrics.push(metrics);
+            self.inference_metrics.push(metrics.clone());
+            self.inference_history.push(&metrics);
         }
     }
 

@@ -5,6 +5,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::Frame;
 
 use crate::app::App;
+use crate::ui::widgets::graph::Graph;
 
 pub fn render(f: &mut Frame, area: Rect, app: &App) {
     let chunks = Layout::default()
@@ -12,11 +13,13 @@ pub fn render(f: &mut Frame, area: Rect, app: &App) {
         .constraints([
             Constraint::Min(10),
             Constraint::Min(10),
+            Constraint::Min(8),
         ])
         .split(area);
 
     render_gpu_details(f, chunks[0], app);
     render_gpu_processes(f, chunks[1], app);
+    render_gpu_history(f, chunks[2], app);
 }
 
 fn render_gpu_details(f: &mut Frame, area: Rect, app: &App) {
@@ -79,4 +82,36 @@ fn render_gpu_processes(f: &mut Frame, area: Rect, app: &App) {
     }
 
     f.render_widget(Paragraph::new(lines), inner);
+}
+
+fn render_gpu_history(f: &mut Frame, area: Rect, app: &App) {
+    let block = Block::default()
+        .title("GPU HISTORY")
+        .borders(Borders::all());
+
+    let inner = block.inner(area);
+    f.render_widget(block, area);
+
+    if app.gpu_history.is_empty() {
+        return;
+    }
+
+    let history = &app.gpu_history[0];
+    let graph_area = Rect::new(inner.left(), inner.top(), inner.width, inner.height / 3);
+    f.render_widget(
+        Graph::new(history.utilization.clone(), 100.0, Color::Green),
+        graph_area,
+    );
+
+    let graph_area = Rect::new(inner.left(), inner.top() + inner.height / 3, inner.width, inner.height / 3);
+    f.render_widget(
+        Graph::new(history.memory.clone(), 100.0, Color::Yellow),
+        graph_area,
+    );
+
+    let graph_area = Rect::new(inner.left(), inner.top() + 2 * inner.height / 3, inner.width, inner.height / 3);
+    f.render_widget(
+        Graph::new(history.temperature.clone(), 100.0, Color::Red),
+        graph_area,
+    );
 }

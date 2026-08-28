@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use crate::engines::{InferenceEngine, ModelInstance, InferenceMetrics};
+use crate::engines::{InferenceEngine, ModelInstance, InferenceMetrics, EngineStatus};
 
 pub struct InferenceCollector {
     engines: Vec<InferenceEngine>,
@@ -17,19 +17,20 @@ impl InferenceCollector {
         self.engines.push(engine);
     }
 
-    pub async fn collect(&self) -> Vec<(InferenceEngine, Vec<ModelInstance>, InferenceMetrics)> {
+    pub async fn collect(&mut self) -> Vec<(InferenceEngine, Vec<ModelInstance>, InferenceMetrics)> {
         let mut results = Vec::new();
 
-        for engine in &self.engines {
-            let models = self.collect_models(engine).await;
-            let metrics = self.collect_metrics(engine).await;
+        for engine in &mut self.engines {
+            let (models, status) = Self::collect_models(engine).await;
+            engine.status = status;
+            let metrics = Self::collect_metrics(engine).await;
             results.push((engine.clone(), models, metrics));
         }
 
         results
     }
 
-    async fn collect_models(&self, engine: &InferenceEngine) -> Vec<ModelInstance> {
+    async fn collect_models(engine: &InferenceEngine) -> (Vec<ModelInstance>, EngineStatus) {
         match engine.engine_type {
             crate::engines::EngineType::Ollama => {
                 crate::engines::ollama::fetch_models(&engine.url).await
@@ -37,11 +38,11 @@ impl InferenceCollector {
             crate::engines::EngineType::Vllm => {
                 crate::engines::vllm::fetch_models(&engine.url).await
             }
-            _ => Vec::new(),
+            _ => (Vec::new(), EngineStatus::Unavailable),
         }
     }
 
-    async fn collect_metrics(&self, engine: &InferenceEngine) -> InferenceMetrics {
+    async fn collect_metrics(engine: &InferenceEngine) -> InferenceMetrics {
         match engine.engine_type {
             crate::engines::EngineType::Ollama => {
                 crate::engines::ollama::fetch_metrics(&engine.url).await
