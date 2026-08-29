@@ -112,7 +112,8 @@ pub struct GpuMetrics {
 
 /// How confidently a GPU process was attributed to an engine and a model.
 ///
-/// `impl-plan.md` §6: "Never present guesses as confirmed facts."
+/// Attribution is heuristic below the first rung, and a guess must never be
+/// rendered as a fact — hence an explicit marker rather than a bare name.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum MappingConfidence {
     /// Derived from an unambiguous identifier (the model blob referenced in
