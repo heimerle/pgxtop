@@ -201,3 +201,63 @@ mod tests {
         assert!(paused.contains("PAUSED"), "{paused}");
     }
 }
+
+#[cfg(test)]
+mod startup_tests {
+    use super::*;
+    use ratatui::backend::{Backend, TestBackend};
+    use ratatui::buffer::Cell;
+
+    /// A screen still holding whatever the shell printed before pgxtop started.
+    fn screen_with_leftovers(w: u16, h: u16) -> TestBackend {
+        let mut backend = TestBackend::new(w, h);
+        let cells: Vec<(u16, u16, Cell)> = (0..h)
+            .flat_map(|y| {
+                (0..w).map(move |x| {
+                    let mut c = Cell::default();
+                    c.set_symbol("X");
+                    (x, y, c)
+                })
+            })
+            .collect();
+        backend
+            .draw(cells.iter().map(|(x, y, c)| (*x, *y, c)))
+            .unwrap();
+        backend
+    }
+
+    fn text(backend: &TestBackend) -> String {
+        let buf = backend.buffer();
+        (0..buf.area.height)
+            .map(|y| {
+                (0..buf.area.width)
+                    .map(|x| buf[(x, y)].symbol().to_string())
+                    .collect::<String>()
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    }
+
+    /// Documents *why* the explicit clear is needed: ratatui diffs against an
+    /// empty previous buffer, so the blanks in the first frame are never
+    /// emitted and the leftovers survive.
+    #[test]
+    fn a_first_draw_alone_leaves_previous_output_on_screen() {
+        let mut t = Terminal::new(screen_with_leftovers(12, 3)).unwrap();
+        t.draw(|f| f.render_widget(Paragraph::new("pgxtop"), f.area()))
+            .unwrap();
+        let s = text(t.backend());
+        assert!(s.contains('X'), "expected leftovers to survive:\n{s}");
+    }
+
+    #[test]
+    fn clearing_before_the_first_draw_removes_them() {
+        let mut t = Terminal::new(screen_with_leftovers(12, 3)).unwrap();
+        t.clear().unwrap();
+        t.draw(|f| f.render_widget(Paragraph::new("pgxtop"), f.area()))
+            .unwrap();
+        let s = text(t.backend());
+        assert!(!s.contains('X'), "leftovers were not cleared:\n{s}");
+        assert!(s.contains("pgxtop"), "{s}");
+    }
+}
