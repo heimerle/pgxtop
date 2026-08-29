@@ -155,6 +155,14 @@ impl App {
         &mut self,
         terminal: &mut Terminal<B>,
     ) -> anyhow::Result<()> {
+        // Entering the alternate screen does not blank it, and ratatui's first
+        // draw only emits cells that differ from its previous buffer — which
+        // starts out empty. Every blank cell in the first frame is therefore
+        // skipped, leaving whatever the shell had printed there visible
+        // underneath the panels. Clearing makes "empty" an accurate model of
+        // the screen, so the diff is correct from the first frame on.
+        terminal.clear()?;
+
         loop {
             let due = self.last_refresh.elapsed() >= Duration::from_millis(self.config.refresh_ms);
             if self.force_refresh || (!self.paused && due) {
@@ -429,7 +437,10 @@ pub fn install_panic_hook() {
     std::panic::set_hook(Box::new(move |info| {
         let _ = crossterm::execute!(
             std::io::stdout(),
-            crossterm::terminal::LeaveAlternateScreen
+            crossterm::terminal::LeaveAlternateScreen,
+            // ratatui hides the cursor while drawing and restores it on drop,
+            // which an abort skips — so restore it here too.
+            crossterm::cursor::Show,
         );
         let _ = crossterm::terminal::disable_raw_mode();
         original(info);
