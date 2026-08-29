@@ -1,0 +1,6 @@
+{
+  "details": {"parent_model":"","format":"gguf","family":"x","families":null,"parameter_size":"1B","quantization_level":"F16"},
+  "model_info": null,
+  "capabilities": null,
+  "parameters": "num_ctx                        8192\nstop                           \"<|im_end|>\"\nstop                           \"<|endoftext|>\"\ntemperature                    0.7"
+}

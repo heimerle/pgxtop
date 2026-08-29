@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+
+use crate::models::series::Series;
 use std::time::Instant;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -10,6 +12,8 @@ pub struct SystemInfo {
     pub total_swap: u64,
 }
 
+/// `disk_io` is not populated by the collector yet.
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct SystemMetrics {
     pub timestamp: Instant,
@@ -40,29 +44,26 @@ pub struct NetworkIo {
 
 #[derive(Debug, Clone)]
 pub struct SystemHistory {
-    pub cpu: Vec<f32>,
-    pub memory: Vec<f32>,
+    /// Overall CPU utilization, percent.
+    pub cpu: Series,
+    /// RAM utilization, percent — comparable with the GPU series.
+    pub memory: Series,
     pub max_points: usize,
 }
 
 impl SystemHistory {
     pub fn new(max_points: usize) -> Self {
         Self {
-            cpu: Vec::with_capacity(max_points),
-            memory: Vec::with_capacity(max_points),
+            cpu: Series::with_capacity(max_points),
+            memory: Series::with_capacity(max_points),
             max_points,
         }
     }
 
-    pub fn push(&mut self, metrics: &SystemMetrics) {
-        self.cpu.push(metrics.cpu_usage);
-        self.memory.push(metrics.used_memory as f32 / 1024.0 / 1024.0 / 1024.0);
-
-        if self.cpu.len() > self.max_points {
-            let excess = self.cpu.len() - self.max_points;
-            self.cpu.drain(0..excess);
-            self.memory.drain(0..excess);
-        }
+    pub fn push(&mut self, metrics: &SystemMetrics, total_memory: u64) {
+        self.cpu.push(Some(metrics.cpu_usage), self.max_points);
+        self.memory
+            .push(crate::format::pct(metrics.used_memory, total_memory), self.max_points);
     }
 }
 

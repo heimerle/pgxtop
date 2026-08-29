@@ -1,127 +1,133 @@
-use ratatui::layout::{Constraint, Direction, Layout, Rect};
-use ratatui::style::{Color, Style};
+use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::style::Style;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Paragraph, Widget};
 use ratatui::Frame;
 
 use crate::app::App;
+use crate::format;
+use crate::ui::panels::{gpu_strip, models_table};
+use crate::ui::theme;
 use crate::ui::widgets::graph::Graph;
 
-pub fn render(f: &mut Frame, area: Rect, app: &App) {
-    let chunks = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-        .split(area);
+pub fn render(f: &mut Frame, area: Rect, app: &mut App) {
+    let summaries = app.gpu_summaries();
+    let gpu_h = gpu_strip::height(&summaries, area.height);
 
-    render_gpu_summary(f, chunks[0], app);
-    render_system_summary(f, chunks[1], app);
+    let [gpu_area, rest] = Layout::vertical([
+        Constraint::Length(gpu_h.min(area.height)),
+        Constraint::Min(3),
+    ])
+    .areas(area);
+
+    gpu_strip::render(
+        f,
+        gpu_area,
+        &app.gpu_info,
+        &summaries,
+        app.collectors.nvml.init_error(),
+        area.height >= 24,
+    );
+
+    let [left, right] =
+        Layout::horizontal([Constraint::Percentage(55), Constraint::Percentage(45)]).areas(rest);
+
+    // The same table as view [3], read-only: no selection, no scrollbar.
+    render_models_summary(f, left, app);
+    render_system(f, right, app);
 }
 
-fn render_gpu_summary(f: &mut Frame, area: Rect, app: &App) {
-    let block = Block::default()
-        .title("GPU")
-        .borders(Borders::all());
+fn render_models_summary(f: &mut Frame, area: Rect, app: &mut App) {
+    let rows: Vec<_> = app
+        .model_rows
+        .iter()
+        .filter(|r| r.is_resident())
+        .cloned()
+        .collect();
+    let mut ui = crate::ui::state::ModelsUiState {
+        multi_engine: app.models_ui.multi_engine,
+        any_engine_connected: app.models_ui.any_engine_connected,
+        ..Default::default()
+    };
+    models_table::render(f, area, &rows, &mut ui, false, chrono::Utc::now());
+}
 
+fn render_system(f: &mut Frame, area: Rect, app: &App) {
+    let block = theme::panel_block(" SYSTEM ", false);
     let inner = block.inner(area);
     f.render_widget(block, area);
+    if inner.height == 0 || inner.width == 0 {
+        return;
+    }
 
-    let mut lines = Vec::new();
-
-    for (i, info) in app.gpu_info.iter().enumerate() {
-        let metrics = app.gpu_metrics.get(i);
+    let mut lines: Vec<Line> = Vec::new();
+    if let (Some(info), Some(m)) = (&app.system_info, &app.system_metrics) {
+        let bar_w = (inner.width as usize).saturating_sub(28).clamp(6, 20);
 
         lines.push(Line::from(vec![
-            Span::raw(format!(" GPU {} ", i)),
-            Span::raw(info.name.clone()),
+            Span::styled(" CPU  ", Style::default().fg(theme::MUTED)),
+            Span::styled(
+                format::bar(m.cpu_usage, bar_w),
+                Style::default().fg(theme::util_color(m.cpu_usage)),
+            ),
+            Span::raw(format!(" {:>5.1}%", m.cpu_usage)),
         ]));
 
-        if let Some(m) = metrics {
-            let gpu_util = m.utilization_gpu.unwrap_or(0.0);
-            let vram_used = m.used_memory;
-            let vram_total = info.total_memory;
-            let temp = m.temperature.unwrap_or(0.0);
-            let power = m.power.unwrap_or(0.0);
+        let mem_pct = format::pct(m.used_memory, info.total_memory);
+        lines.push(Line::from(vec![
+            Span::styled(" RAM  ", Style::default().fg(theme::MUTED)),
+            Span::styled(
+                format::bar(mem_pct.unwrap_or(0.0), bar_w),
+                Style::default().fg(theme::mem_color(mem_pct.unwrap_or(0.0))),
+            ),
+            Span::raw(format!(
+                " {}/{} {}",
+                format::bytes_iec_value(m.used_memory, info.total_memory),
+                format::bytes_iec_value(info.total_memory, info.total_memory),
+                format::bytes_iec_unit(info.total_memory),
+            )),
+        ]));
 
+        if info.total_swap > 0 {
+            let swap_pct = format::pct(m.used_swap, info.total_swap).unwrap_or(0.0);
             lines.push(Line::from(vec![
-                Span::raw(format!(" GPU   {}   ", format_bar(gpu_util, 20))),
-                Span::raw(format!("{:.0}%", gpu_util)),
-            ]));
-
-            lines.push(Line::from(vec![
-                Span::raw(format!(" VRAM  {}   ", format_bar(
-                    (vram_used as f32 / vram_total as f32) * 100.0, 20
-                ))),
-                Span::raw(format!("{}/{} GB", vram_used / 1024 / 1024, vram_total / 1024 / 1024)),
-            ]));
-
-            lines.push(Line::from(vec![
-                Span::raw(format!(" TEMP  {:.0}C   ", temp)),
-                Span::raw(format!("POWER {:.0}W", power)),
+                Span::styled(" SWAP ", Style::default().fg(theme::MUTED)),
+                Span::styled(
+                    format::bar(swap_pct, bar_w),
+                    Style::default().fg(theme::mem_color(swap_pct)),
+                ),
+                Span::raw(format!(" {}", format::bytes_iec(m.used_swap))),
             ]));
         }
+
+        lines.push(Line::raw(""));
+        lines.push(Line::from(vec![
+            Span::styled(" LOAD ", Style::default().fg(theme::MUTED)),
+            Span::raw(format!(
+                "{:.2} / {:.2} / {:.2}   {} cores",
+                m.load_avg[0], m.load_avg[1], m.load_avg[2], info.cpu_count
+            )),
+        ]));
+    } else {
+        lines.push(Line::from(Span::styled(
+            " collecting…",
+            Style::default().fg(theme::MUTED),
+        )));
     }
 
-    // Show GPU history sparkline if available
-    if let Some(history) = app.gpu_history.get(0) {
-        if !history.utilization.is_empty() {
-            let spark_area = Rect::new(inner.left(), inner.top() + inner.height - 3, inner.width, 3);
-            f.render_widget(
-                Graph::new(history.utilization.clone(), 100.0, Color::Green),
-                spark_area,
-            );
-        }
-    }
-
+    let text_h = lines.len() as u16;
     f.render_widget(Paragraph::new(lines), inner);
-}
 
-fn render_system_summary(f: &mut Frame, area: Rect, app: &App) {
-    let block = Block::default()
-        .title("SYSTEM")
-        .borders(Borders::all());
-
-    let inner = block.inner(area);
-    f.render_widget(block, area);
-
-    let mut lines = Vec::new();
-
-    if let Some(metrics) = &app.system_metrics {
-        let cpu = metrics.cpu_usage;
-        let mem_used = metrics.used_memory;
-        let mem_total = app.system_info.as_ref().map(|s| s.total_memory).unwrap_or(1);
-
-        lines.push(Line::from(vec![
-            Span::raw(format!(" CPU   {}   ", format_bar(cpu, 20))),
-            Span::raw(format!("{:.0}%", cpu)),
-        ]));
-
-        lines.push(Line::from(vec![
-            Span::raw(format!(" RAM   {}   ", format_bar(
-                (mem_used as f32 / mem_total as f32) * 100.0, 20
-            ))),
-            Span::raw(format!("{}/{} GB", mem_used / 1024 / 1024, mem_total / 1024 / 1024)),
-        ]));
-
-        lines.push(Line::from(vec![
-            Span::raw(format!(" Load  {:.2} / {:.2} / {:.2}",
-                metrics.load_avg[0], metrics.load_avg[1], metrics.load_avg[2])),
-        ]));
+    // The graph is drawn *below* the text, not underneath it — previously the
+    // Paragraph was rendered after the Graph into the same rect and erased it.
+    if inner.height > text_h + 1 {
+        let graph_area = Rect {
+            x: inner.x,
+            y: inner.y + text_h + 1,
+            width: inner.width,
+            height: inner.height - text_h - 1,
+        };
+        Graph::new(app.system_history.cpu.as_slice(), 100.0, theme::ACCENT)
+            .render(graph_area, f.buffer_mut());
     }
-
-    // Show CPU history sparkline if available
-    if !app.system_history.cpu.is_empty() {
-        let spark_area = Rect::new(inner.left(), inner.top() + inner.height - 3, inner.width, 3);
-        f.render_widget(
-            Graph::new(app.system_history.cpu.clone(), 100.0, Color::Cyan),
-            spark_area,
-        );
-    }
-
-    f.render_widget(Paragraph::new(lines), inner);
-}
-
-fn format_bar(percent: f32, width: usize) -> String {
-    let filled = (percent / 100.0 * width as f32).round() as usize;
-    let empty = width.saturating_sub(filled);
-    format!("{}{}", "█".repeat(filled), "░".repeat(empty))
 }

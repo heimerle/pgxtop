@@ -1,0 +1,14 @@
+{
+  "models": [
+    {
+      "name": "broken-clock:latest",
+      "model": "broken-clock:latest",
+      "size": 2000,
+      "digest": "beef",
+      "details": {"parent_model":"","format":"gguf","family":"x","families":["x"],"parameter_size":"1B","quantization_level":"F16"},
+      "expires_at": "not-a-date",
+      "size_vram": 2000,
+      "context_length": 4096
+    }
+  ]
+}

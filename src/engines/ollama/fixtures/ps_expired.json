@@ -1,0 +1,13 @@
+{
+  "models": [
+    {
+      "name": "stale:latest",
+      "model": "stale:latest",
+      "size": 1000,
+      "digest": "def",
+      "details": {"parent_model":"","format":"gguf","family":"x","families":["x"],"parameter_size":"1B","quantization_level":"F16"},
+      "expires_at": "2026-08-29T11:59:30.000000000Z",
+      "size_vram": 0
+    }
+  ]
+}

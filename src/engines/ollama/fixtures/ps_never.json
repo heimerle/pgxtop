@@ -1,0 +1,13 @@
+{
+  "models": [
+    {
+      "name": "zero-time:latest",
+      "model": "zero-time:latest",
+      "size": 1000,
+      "digest": "abc",
+      "details": {"parent_model":"","format":"gguf","family":"x","families":["x"],"parameter_size":"1B","quantization_level":"F16"},
+      "expires_at": "0001-01-01T00:00:00Z",
+      "size_vram": 1000
+    }
+  ]
+}
