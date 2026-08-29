@@ -419,7 +419,7 @@ mod tests {
         assert!(!t.contains("loading"), "{t}");
     }
 
-    /// impl-plan.md §6: never present a guess as a confirmed fact.
+    /// A guess must never be rendered as a confirmed fact.
     #[test]
     fn process_confidence_is_always_marked() {
         let confirmed = text(&lines(

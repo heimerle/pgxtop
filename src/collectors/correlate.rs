@@ -1,8 +1,9 @@
 //! Attributing GPU processes to inference engines and to individual models.
 //!
-//! `impl-plan.md` §6 is explicit: "Never present guesses as confirmed facts."
-//! Every mapping therefore carries a [`MappingConfidence`], and the UI renders
-//! the marker rather than silently presenting a heuristic as a fact.
+//! The rule this module is built around: never present a guess as a
+//! confirmed fact. Every mapping therefore carries a [`MappingConfidence`],
+//! and the UI renders the marker rather than silently passing a heuristic off
+//! as certainty.
 //!
 //! Everything here works off `/proc/<pid>/cmdline`. Measured on the target
 //! host, an Ollama runner looks like:
