@@ -1,0 +1,14 @@
+{
+  "models": [
+    {
+      "name": "nomic-embed-text:latest",
+      "model": "nomic-embed-text:latest",
+      "size": 274000000,
+      "digest": "6666bbbb7777",
+      "details": {"parent_model":"","format":"gguf","family":"nomic-bert","families":["nomic-bert"],"parameter_size":"137M","quantization_level":"F16"},
+      "expires_at": "2318-06-16T12:00:00.000000000Z",
+      "size_vram": 274000000,
+      "context_length": 8192
+    }
+  ]
+}

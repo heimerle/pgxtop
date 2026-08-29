@@ -1,0 +1,30 @@
+{
+  "license": "irrelevant, never deserialized",
+  "modelfile": "FROM /usr/share/ollama/.ollama/models/blobs/sha256-cccc9999",
+  "template": "{{ .Prompt }}",
+  "details": {
+    "parent_model": "",
+    "format": "gguf",
+    "family": "examplemoe",
+    "families": ["examplemoe"],
+    "parameter_size": "120B",
+    "quantization_level": "Q8_0"
+  },
+  "model_info": {
+    "general.architecture": "examplemoe",
+    "general.file_type": 7,
+    "general.parameter_count": 120000000000,
+    "general.size_label": "128x2B",
+    "general.type": "model",
+    "examplemoe.attention.head_count_kv": 8,
+    "examplemoe.attention.key_length": 128,
+    "examplemoe.block_count": 48,
+    "examplemoe.context_length": 262144,
+    "examplemoe.embedding_length": 3072,
+    "examplemoe.expert_count": 256,
+    "examplemoe.expert_used_count": 10
+  },
+  "tensors": [{"name": "token_embd.weight", "type": "Q8_0", "shape": [3072, 151936]}],
+  "capabilities": ["completion", "tools", "thinking"],
+  "modified_at": "2026-08-22T13:19:20.595027617+02:00"
+}

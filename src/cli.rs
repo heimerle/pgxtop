@@ -4,8 +4,10 @@ use clap::Parser;
 #[command(name = "pgxtop", version, about = "A btop-style TUI for NVIDIA AI workstations")]
 pub struct Cli {
     /// Refresh interval in milliseconds
-    #[arg(long, default_value = "500")]
-    pub refresh: u64,
+    // Option rather than a clap default: an unset flag must not clobber the
+    // value from config.toml.
+    #[arg(long)]
+    pub refresh: Option<u64>,
 
     /// Ollama endpoint URL
     #[arg(long)]

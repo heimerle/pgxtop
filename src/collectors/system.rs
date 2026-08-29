@@ -4,14 +4,12 @@ use crate::models::{SystemInfo, SystemMetrics, ProcessInfo};
 
 pub struct SystemCollector {
     sys: sysinfo::System,
-    prev_net_io: Option<(u64, u64)>,
 }
 
 impl SystemCollector {
     pub fn new() -> Self {
         Self {
             sys: sysinfo::System::new_all(),
-            prev_net_io: None,
         }
     }
 

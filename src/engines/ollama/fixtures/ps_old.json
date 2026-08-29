@@ -1,0 +1,20 @@
+{
+  "models": [
+    {
+      "name": "llama3.1:70b",
+      "model": "llama3.1:70b",
+      "size": 42000000000,
+      "digest": "6666bbbb7777cccc8888dddd9999eeee0000ffff1111222233334444aaaa5555",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": null,
+        "parameter_size": "70.6B",
+        "quantization_level": "Q4_0"
+      },
+      "expires_at": "2026-08-29T12:04:00.000000000+02:00",
+      "size_vram": 42000000000
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "models": [
+    {
+      "name": "future:latest",
+      "model": "future:latest",
+      "size": 3000,
+      "digest": "cafe",
+      "details": {"parent_model":"","format":"gguf","family":"x","families":["x"],"parameter_size":"1B","quantization_level":"F16","some_new_detail":42},
+      "expires_at": "2026-08-29T12:10:00.000000000Z",
+      "size_vram": 3000,
+      "context_length": 4096,
+      "a_field_from_a_future_release": {"nested": true}
+    }
+  ],
+  "another_new_top_level_field": [1, 2, 3]
+}
